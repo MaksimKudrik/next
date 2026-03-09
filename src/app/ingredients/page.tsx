@@ -1,7 +1,7 @@
-const AboutPage = () => {
-  return (  
-    <div className=""><h1>О нас</h1></div>
-  );
-}
+const IngredientsPage = () =>{
+  return(
+    <div className=""><h1>Ингредиенты</h1></div>
 
-export default AboutPage;
+  )
+}
+export default IngredientsPage
