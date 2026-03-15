@@ -18,7 +18,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       authorize: async (credentials) => {
         try {
           if (!credentials?.email || !credentials?.password) {
-            throw new Error("Email и пароль обязательны");
+            return null;
           }
 
           const { email, password } =
@@ -26,8 +26,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
           const user = await getUserFromDb(email);
 
-          if (!user || user.password) {
-            throw new Error("Неверный ввод данных");
+          if (!user || !user.password) {
+            return null;
           }
 
           const isPasswordValid = await bcryptjs.compare(
@@ -36,7 +36,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           );
 
           if (!isPasswordValid) {
-            throw new Error("Неверный ввод данных");
+            return null
           }
 
           return {
@@ -47,22 +47,22 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           if (error instanceof ZodError) {
             return null;
           }
-          return null;
+        return null;
         }
       },
     }),
   ],
   session: {
-    strategy: 'jwt',
-    maxAge: 3600,
+    strategy: "jwt",
+    maxAge: 86400,
   },
   secret: process.env.BETTER_AUTH_SECRET,
-  callbacks: {
-    async jwt({token, user}){
-      if(user){
-        token.id = user.id
+    callbacks: {
+      async jwt( { token, user } ){
+        if (user) {
+          token.id = user.id
+        }
+        return token
       }
-      return token
     }
-  }
 });

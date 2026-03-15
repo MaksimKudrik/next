@@ -13,7 +13,7 @@ const LoginForm = ({onClose}: IProps) => {
   const [formData, setFormData] =  useState({
     email: "",
     password: "",
-    confirmPassword: ""
+
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -21,6 +21,7 @@ const LoginForm = ({onClose}: IProps) => {
     console.log(formData);
     const result =await singInWithCredentials(formData.email, formData.password)
     console.log(result)
+    window.location.reload();
     onClose();
   };
   return (

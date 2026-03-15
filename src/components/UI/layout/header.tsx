@@ -1,7 +1,6 @@
 'use client';
 import { siteConfig } from "@/config/site.config";
 import {Navbar, NavbarBrand, NavbarContent, NavbarItem, Button} from "@heroui/react";
-
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -10,7 +9,7 @@ import RegistrationModal from "../modals/registration.modal";
 import { useState } from "react";
 import LoginModal from "../modals/login.modal";
 import { singOutFunc } from "@/actions/sing-out";
-import { useSession } from "next-auth/react";
+import { useAuthStore } from "@/store/auth.store";
 export const Logo = () => {
   return (
     <Image
@@ -26,16 +25,25 @@ export const Logo = () => {
 export default function Header() {
   const pathname = usePathname();
 
-  const {data: session, status} = useSession();
-  const isAuth = status === "authenticated";
-  console.log("session", session)
-  console.log("status", status)
+  const {isAuth, session, status, setAuthState} = useAuthStore();
+
+
+
+
 
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
 
   const handleSingOut = async () => {
-    await singOutFunc();
+    
+
+    try {
+      await singOutFunc();
+    } catch (error) {
+      console.log(error)
+    }
+
+    setAuthState("unauthenticated",null)
   }
 
   const getNavItems =() =>{
@@ -48,13 +56,12 @@ export default function Header() {
               color="foreground"
               href={item.href}
               className={`px-3 py-1
-              ${isActive ? "text-blue-500" : "text-foreground"}
-              hover:text-blue-300 hover:border
-              hover:border-blue-300 hover:rounded-md
-              transition-color
-              transition-border
-              duration-200
-              `}>
+                ${isActive ? "text-blue-500" : "text-foreground"}
+                hover:text-blue-300 hover:border
+                hover:border-blue-300 hover:rounded-md
+                transition-color
+                transition-border
+                duration-200`}>
                 {item.label}
               </Link>
             </NavbarItem>
@@ -76,9 +83,10 @@ export default function Header() {
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
         {getNavItems()}
       </NavbarContent>
-      <NavbarContent justify="end">
+
+        <NavbarContent justify="end">
         {isAuth && <p>Привет, {session?.user?.email}</p>}
-        {!isAuth ?
+        {status === "loading" ? <p>Загрузка...</p> : !isAuth ?
         <>
           <NavbarItem className="hidden lg:flex">
           <Button 
@@ -116,7 +124,7 @@ export default function Header() {
 
 
       </NavbarContent>
-
+      
 
       <RegistrationModal
         isOpen={isRegistrationOpen}
