@@ -9,6 +9,8 @@ import { layoutConfig } from "@/config/layout.config";
 import RegistrationModal from "../modals/registration.modal";
 import { useState } from "react";
 import LoginModal from "../modals/login.modal";
+import { singOutFunc } from "@/actions/sing-out";
+import { useSession } from "next-auth/react";
 export const Logo = () => {
   return (
     <Image
@@ -24,8 +26,17 @@ export const Logo = () => {
 export default function Header() {
   const pathname = usePathname();
 
+  const {data: session, status} = useSession();
+  const isAuth = status === "authenticated";
+  console.log("session", session)
+  console.log("status", status)
+
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
+
+  const handleSingOut = async () => {
+    await singOutFunc();
+  }
 
   const getNavItems =() =>{
     return(
@@ -66,7 +77,10 @@ export default function Header() {
         {getNavItems()}
       </NavbarContent>
       <NavbarContent justify="end">
-        <NavbarItem className="hidden lg:flex">
+        {isAuth && <p>Привет, {session?.user?.email}</p>}
+        {!isAuth ?
+        <>
+          <NavbarItem className="hidden lg:flex">
           <Button 
             as={Link}
             color="secondary" 
@@ -86,6 +100,21 @@ export default function Header() {
             Регистрация
           </Button>
         </NavbarItem>
+        </>
+        :
+        <NavbarItem className="hidden lg:flex">
+          <Button 
+            as={Link}
+            color="secondary" 
+            href="#" 
+            variant="flat"
+            onPress={handleSingOut}>
+            Выйти
+          </Button>
+        </NavbarItem>
+        }
+
+
       </NavbarContent>
 
 

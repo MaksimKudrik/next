@@ -1,4 +1,5 @@
 'use client'
+import { singInWithCredentials } from "@/actions/sing-in";
 import { Button } from "@heroui/button";
 import { Form } from "@heroui/form";
 import { Input } from "@heroui/input";
@@ -18,6 +19,8 @@ const LoginForm = ({onClose}: IProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log(formData);
+    const result =await singInWithCredentials(formData.email, formData.password)
+    console.log(result)
     onClose();
   };
   return (
